@@ -1,0 +1,22 @@
+# Tailworm tripwires for root tailscaled (feed Wazuh rules 100520-100523).
+#
+# Install:  sudo cp tailworm.rules /etc/audit/rules.d/ && sudo augenrules --load
+# Check:    sudo auditctl -l | grep tailworm
+#
+# Check the tailscaled path first (`command -v tailscaled`). Packages use
+# /usr/sbin/tailscaled; static installs often use /usr/bin or /usr/local/bin.
+# Containerized tailscaled (sidecars, k8s proxies) has a different binary and
+# is NOT covered by the exe filter. Rely on the posture check for those.
+
+# F1/F3/F7: root tailscaled connect()ing to a unix socket. addrlen 16 and 28 are
+# IPv4 and IPv6 (Go passes exactly those), so this skips tailscaled's normal
+# network traffic and keeps only unix-socket dials. euid=0 skips the
+# per-session "be-child" processes, which run as the SSH user.
+-a always,exit -F arch=b64 -S connect -F exe=/usr/sbin/tailscaled -F euid=0 -F a2!=16 -F a2!=28 -k tailworm_unix_dial
+
+# F2: a root-only socket unlinked, renamed or re-permissioned (ssh -R BindUnlink).
+# The parent directory must exist, so keep only the lines for sockets this host has.
+-w /run/docker.sock -p wa -k tailworm_sock
+# -w /run/containerd/containerd.sock -p wa -k tailworm_sock
+# -w /run/k3s/containerd/containerd.sock -p wa -k tailworm_sock
+# -w /run/podman/podman.sock -p wa -k tailworm_sock

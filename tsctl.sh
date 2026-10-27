@@ -79,7 +79,8 @@ do_status() {
   if live_forwarding_off; then _f="off (live)"
   elif [ -f "$DROP" ]; then _f="off (configured, NOT live until restart)"
   else _f="on"; fi
-  res status ok "ssh=$(pref_bool "$_p" RunSSH) forwarding=$_f webclient=$(pref_bool "$_p" RunWebClient) autoupdate=$(autoupdate_state "$_p") init=$([ "$SYSTEMD" = 1 ] && echo systemd || echo other)"
+  _ver=$([ -n "$TS" ] && "$TS" version 2>/dev/null | head -n 1)
+  res status ok "ssh=$(pref_bool "$_p" RunSSH) forwarding=$_f webclient=$(pref_bool "$_p" RunWebClient) autoupdate=$(autoupdate_state "$_p") init=$([ "$SYSTEMD" = 1 ] && echo systemd || echo other) version=${_ver:-unknown}"
 }
 
 ts_set() { # <setting> <flag> <value> <current>

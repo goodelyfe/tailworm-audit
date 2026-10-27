@@ -1,0 +1,27 @@
+# Sample events for /var/ossec/bin/wazuh-logtest on the manager.
+# Paste one line at a time (skip the comments). Expected rule in brackets.
+# Hosts, PIDs and timestamps are made up.
+
+# [100511] forwarding on, mitigation missing
+ossec: output: 'tailworm-posture': RESULT=status|ok|ssh=true forwarding=on webclient=false autoupdate=on init=systemd version=1.104.2
+
+# [100512] configured, not live
+ossec: output: 'tailworm-posture': RESULT=status|ok|ssh=true forwarding=off (configured, NOT live until restart) webclient=false autoupdate=on init=systemd version=1.104.2
+
+# [100510, no alert] mitigated
+ossec: output: 'tailworm-posture': RESULT=status|ok|ssh=true forwarding=off (live) webclient=false autoupdate=on init=systemd version=1.104.2
+
+# [100522] root tailscaled dialed /run/docker.sock (syscall 42 = connect on x86_64, a2=0x13 = 19 bytes)
+type=SYSCALL msg=audit(1793124131.512:4821): arch=c000003e syscall=42 success=yes exit=0 a0=7 a1=c000a1c2a0 a2=13 a3=0 items=1 ppid=1 pid=812 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm="tailscaled" exe="/usr/sbin/tailscaled" key="tailworm_unix_dial" type=SOCKADDR msg=audit(1793124131.512:4821): saddr=01002F72756E2F646F636B65722E736F636B00
+
+# [100523, no alert] root tailscaled talking to systemd notify
+type=SYSCALL msg=audit(1793124140.001:4830): arch=c000003e syscall=42 success=yes exit=0 a0=9 a1=c000b2d0e0 a2=16 a3=0 items=1 ppid=1 pid=812 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm="tailscaled" exe="/usr/sbin/tailscaled" key="tailworm_unix_dial" type=SOCKADDR msg=audit(1793124140.001:4830): saddr=01002F72756E2F73797374656D642F6E6F7469667900
+
+# [100521] tailscaled unlinked docker.sock (syscall 263 = unlinkat on x86_64)
+type=SYSCALL msg=audit(1793124200.100:4901): arch=c000003e syscall=263 success=yes exit=0 a0=ffffff9c a1=c0001b4000 a2=0 a3=0 items=2 ppid=1 pid=812 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm="tailscaled" exe="/usr/sbin/tailscaled" key="tailworm_sock" type=PATH msg=audit(1793124200.100:4901): item=1 name="/run/docker.sock" inode=1234 dev=00:19 mode=0140660 ouid=0 ogid=999 rdev=00:00 nametype=DELETE
+
+# [100524] OOM kill
+Oct 27 14:02:11 node1 kernel: Out of memory: Killed process 812 (tailscaled) total-vm:2489240kB, anon-rss:1904312kB, file-rss:0kB, shmem-rss:0kB, UID:0 pgtables:4044kB oom_score_adj:0
+
+# [100525] restart (paste 3 times within 10 minutes for 100526)
+Oct 27 14:02:12 node1 systemd[1]: tailscaled.service: Scheduled restart job, restart counter is at 3.

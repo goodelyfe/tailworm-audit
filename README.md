@@ -1,6 +1,6 @@
 # tailworm-audit
 
-Fleet-wide audit, active probe and hardening toggles for the **Tailworm** Tailscale findings (Oct 2026), plus the adjacent exposures the public write-ups don't cover.
+Fleet-wide audit, active probe, hardening toggles and Wazuh detection rules for the **Tailworm** Tailscale findings (Oct 2026), plus the adjacent exposures the public write-ups don't cover.
 
 Tailworm's headline: Tailscale SSH forwarding runs inside the root `tailscaled`. That makes **any** SSH grant to a node, including "non-root" ones, a path to root-only unix sockets like `docker.sock`. Tailscale SSH does restrict unix-socket forwards to an allowlist of directories (`/tmp` and the user's home, in our tests), and Tailworm F3 is a race that defeats exactly that allowlist. When this was published there was no fix. The mitigation is `TS_SSH_DISABLE_FORWARDING=1` in tailscaled's environment, and this tool checks that it's actually in effect.
 
@@ -36,6 +36,8 @@ If it can't find the CLI it asks for the path once and remembers it in `~/.confi
 | `tailworm_audit.py` | admin box | All the analysis (stdlib only): `analyze`, `policy`, `api`, `peers`. |
 | `tests/` | anywhere | `python3 -m unittest discover -s tests` (synthetic fixtures). |
 | `examples/sample-report.md` | - | What a report looks like, generated from the test fixtures (made-up hosts). |
+| `wazuh/` | Wazuh manager + agents | Rules, agent config and sample events for ongoing detection (see [Detect with Wazuh](#detect-with-wazuh)). |
+| `auditd/tailworm.rules` | each node | auditd tripwires on root `tailscaled`, feeding the Wazuh rules. |
 
 ## Toggles
 
@@ -135,13 +137,46 @@ TW_PATCHED=<version> ./fleet.sh --probe     # nodes below that version become HI
 
 Keep forwarding off where you don't use it, even after patching. If nothing tunnels through a node, it doesn't need the capability. Turn it back on per node with `--set forwarding=on`.
 
+## Detect with Wazuh
+
+The audit is a snapshot. These rules keep watching after it: they alert when the mitigation regresses, and they set tripwires for the exploit paths themselves. Once forwarding is off, root `tailscaled` has no reason to dial a unix socket or touch `docker.sock`, so those tripwires stay quiet until something is wrong.
+
+| Rules | Level | Fires when | Needs |
+|---|---|---|---|
+| 100511 | 10 | Tailscale SSH on with forwarding enabled | posture command |
+| 100512 | 8 | Mitigation configured but not live (restart pending) | posture command |
+| 100513 / 100514 | 5 / 3 | Web client on / auto-update off | posture command |
+| 100515 | 5 | The posture check itself failed | posture command |
+| 100516 | 12 | The mitigation drop-in was deleted | FIM |
+| 100517 / 100518 | 10 / 7 | tailscaled's environment changed / a new drop-in appeared | FIM |
+| 100521 | 12 | `tailscaled` unlinked or replaced a root socket (F2) | auditd |
+| 100520 | 5 | Any other process replaced a watched root socket (dockerd restarts do this) | auditd |
+| 100522 | 12 | Root `tailscaled` dialed a filesystem unix socket (F1/F3 forward, F7 Serve to LocalAPI) | auditd |
+| 100524 / 100526 | 10 | OOM killer took `tailscaled` / 3 crash restarts in 10 minutes (F5) | journal or syslog |
+
+**Install**
+
+1. Manager: copy `wazuh/rules/tailworm.xml` to `/var/ossec/etc/rules/` and restart the manager. IDs are 100510–100526; renumber if they clash.
+2. Manager: copy `tsctl.sh` to `/var/ossec/etc/shared/<group>/`. Wazuh syncs it to that group's agents at `/var/ossec/etc/shared/tsctl.sh`.
+3. Agents: merge `wazuh/agent-snippets.xml` into `ossec.conf`, or into the group's `agent.conf`. From `agent.conf`, the posture command only runs if the agent has `logcollector.remote_commands=1` in `local_internal_options.conf`.
+4. Nodes: `sudo cp auditd/tailworm.rules /etc/audit/rules.d/ && sudo augenrules --load`. Check the `tailscaled` path and keep only the socket watches that exist on that host.
+5. Test: paste lines from `wazuh/test-events.txt` into `/var/ossec/bin/wazuh-logtest`.
+
+**Tuning**
+
+- A node where you keep forwarding on on purpose: leave the posture command out of its config, or 100511 fires every hour.
+- `tsctl.sh forwarding=on` deletes the drop-in, so 100516 fires once. That's the point: a revert you didn't make looks the same.
+- Serve to a `unix:` backend makes `tailscaled` dial that socket on every request. Add its path to rule 100523, which already ignores systemd notify, D-Bus and abstract sockets.
+- The auditd `exe` filter doesn't see containerized `tailscaled` (sidecars, k8s proxies). The audit's TW22 check covers those.
+- Run it for a day before wiring alerts to your phone.
+
 ## Knobs
 
 `TW_FLOOR` (default 1.98.9), `TW_PATCHED`, `TW_RECENT_DAYS` (14), `TW_TRY_USERS` ("root ubuntu dietpi pi"), `TW_TIMEOUT` (600s per node), `TS_CLI`, `TW_TRANSPORT`. For the collector: `TW_USERS`, `TW_SECRET_PATHS` (add your stack dirs), `TW_SKIP_SECRETS=1`, `TW_K8S=1`. For the API audit: `TS_API_KEY`, or `TS_OAUTH_CLIENT_ID` + `TS_OAUTH_CLIENT_SECRET` (scopes `devices:core:read`, `auth_keys:read`, `feature_settings:read`).
 
 ## Limits
 
-It can't log into SSH servers it has no grant for (TW90). It doesn't look inside tsnet apps (tsidp, tsrecorder, golink). It doesn't attempt the F3 race. Secret scanning is bounded to `TW_SECRET_PATHS`. Docker events cover 72h and the journal 7 days. It's a point-in-time audit, not monitoring.
+It can't log into SSH servers it has no grant for (TW90). It doesn't look inside tsnet apps (tsidp, tsrecorder, golink). It doesn't attempt the F3 race. Secret scanning is bounded to `TW_SECRET_PATHS`. Docker events cover 72h and the journal 7 days. The audit itself is point-in-time; the Wazuh rules are the monitoring half. The auditd tripwires catch the forward or socket swap happening, not the F3 race on its own.
 
 ## License
 

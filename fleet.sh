@@ -21,7 +21,7 @@
 # Tailscale CLI: TS_CLI=/path, else remembered choice, else auto-detected, else asked.
 # Output: ~/tailworm-out/<timestamp>/{raw/*, report.md, report.json}  (TW_OUT_DIR to change)
 set -uo pipefail
-TW_VERSION=7
+TW_VERSION=8
 
 [ "${BASH_VERSINFO[0]}" -gt 4 ] || { [ "${BASH_VERSINFO[0]}" -eq 4 ] && [ "${BASH_VERSINFO[1]}" -ge 3 ]; } \
   || { echo "fleet: needs bash >= 4.3 (macOS: brew install bash, then run with that bash)" >&2; exit 3; }

@@ -1,0 +1,55 @@
+<!--
+  Agent-side config for the tailworm rules. Merge these blocks into
+  /var/ossec/etc/ossec.conf on each Tailscale node, or into a group's
+  agent.conf on the manager, then restart the agent.
+
+  Posture check: put tsctl.sh in the group's shared folder on the manager
+  (/var/ossec/etc/shared/<group>/tsctl.sh). Wazuh syncs it to every agent in
+  that group at /var/ossec/etc/shared/tsctl.sh. It only reads settings when
+  called with `status`.
+
+  Commands set from the manager's agent.conf (not the local ossec.conf) only
+  run if the agent allows remote commands. Add this line to
+  /var/ossec/etc/local_internal_options.conf on the agent:
+      logcollector.remote_commands=1
+-->
+<ossec_config>
+
+  <!-- 1. Posture (rules 100510-100515): one line per hour, e.g.
+       RESULT=status|ok|ssh=true forwarding=off (live) webclient=false autoupdate=on init=systemd version=1.104.2
+       Leave this out on a node where you deliberately keep forwarding on. -->
+  <localfile>
+    <log_format>command</log_format>
+    <command>sh /var/ossec/etc/shared/tsctl.sh status</command>
+    <alias>tailworm-posture</alias>
+    <frequency>3600</frequency>
+  </localfile>
+
+  <!-- 2. Regression (rules 100516-100518): the mitigation lives in these files. -->
+  <syscheck>
+    <directories realtime="yes" report_changes="yes">/etc/systemd/system/tailscaled.service.d</directories>
+    <directories realtime="yes" report_changes="yes">/etc/default/tailscaled</directories>
+  </syscheck>
+
+  <!-- 3. Tripwires (rules 100520-100523): needs ../auditd/tailworm.rules loaded.
+       Skip if you already collect audit.log (the php2shell config does). -->
+  <localfile>
+    <log_format>audit</log_format>
+    <location>/var/log/audit/audit.log</location>
+  </localfile>
+
+  <!-- 4. Crash loop (rules 100524-100526): kernel OOM kills and systemd restart
+       messages. Skip if the agent already reads syslog or the journal.
+       journald collection needs Wazuh 4.8+; on older agents, read /var/log/syslog. -->
+  <localfile>
+    <location>journald</location>
+    <log_format>journald</log_format>
+    <filter field="SYSLOG_IDENTIFIER">^kernel$</filter>
+  </localfile>
+  <localfile>
+    <location>journald</location>
+    <log_format>journald</log_format>
+    <filter field="UNIT">^tailscaled\.service$</filter>
+  </localfile>
+
+</ossec_config>
