@@ -1,0 +1,11 @@
+{"Version":"1.104.2","Self":{"DNSName":"admin-laptop.example.ts.net."},
+ "Peer":{
+  "a":{"DNSName":"mitigated-01.example.ts.net.","TailscaleIPs":["100.64.0.1"],"Tags":["tag:managed-host"],"OS":"linux","Online":true,"sshHostKeys":["ssh-ed25519 AAA"]},
+  "b":{"DNSName":"staged-02.example.ts.net.","TailscaleIPs":["100.64.0.2"],"Tags":["tag:managed-host"],"OS":"linux","Online":true,"sshHostKeys":["ssh-ed25519 AAA"]},
+  "c":{"DNSName":"router-01.example.ts.net.","TailscaleIPs":["100.64.0.3"],"Tags":["tag:router"],"OS":"linux","Online":true,"sshHostKeys":["ssh-ed25519 AAA"]},
+  "d":{"DNSName":"dockerhost-01.example.ts.net.","TailscaleIPs":["100.64.0.4"],"Tags":["tag:docker-host"],"OS":"linux","Online":true,"sshHostKeys":["ssh-ed25519 AAA"]},
+  "e":{"DNSName":"pve-01.example.ts.net.","TailscaleIPs":["100.64.0.5"],"OS":"linux","Online":true,"sshHostKeys":["ssh-ed25519 AAA"]},
+  "f":{"DNSName":"ts-sidecar.example.ts.net.","TailscaleIPs":["100.64.0.6"],"Tags":["tag:forgejo"],"OS":"linux","Online":true,"sshHostKeys":["ssh-ed25519 AAA"]},
+  "g":{"DNSName":"phone.example.ts.net.","TailscaleIPs":["100.64.0.7"],"OS":"android","Online":true},
+  "h":{"DNSName":"shared-laptop.other.ts.net.","TailscaleIPs":["100.64.0.8"],"OS":"linux","Online":true,"ShareeNode":true,"sshHostKeys":["ssh-ed25519 AAA"]}
+ }}

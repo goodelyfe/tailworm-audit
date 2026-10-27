@@ -1,0 +1,2 @@
+[{"id":"kAbc123","description":"compose stacks","expires":"2027-01-01T00:00:00Z","capabilities":{"devices":{"create":{"reusable":true,"ephemeral":false,"preauthorized":true,"tags":["tag:docker-host"]}}}},
+ {"id":"kOneShot","capabilities":{"devices":{"create":{"reusable":false,"ephemeral":true,"preauthorized":true}}}}]

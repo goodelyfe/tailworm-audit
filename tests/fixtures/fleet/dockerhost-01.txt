@@ -1,0 +1,72 @@
+=====TW:BEGIN:meta=====
+collector_version=1
+hostname=dockerhost-01
+uid=0
+init=systemd
+have_ss=1
+have_docker=1
+=====TW:END:meta=====
+=====TW:BEGIN:ts_version=====
+1.104.2
+=====TW:END:ts_version=====
+=====TW:BEGIN:ts_status=====
+{"Version":"1.104.2","Self":{"DNSName":"dockerhost-01.example.ts.net.","HostName":"dockerhost-01","OS":"linux","Tags":["tag:docker-host"]}}
+=====TW:END:ts_status=====
+=====TW:BEGIN:ts_prefs=====
+{"RunSSH":false,"AutoUpdate":{"Check":true,"Apply":true}}
+=====TW:END:ts_prefs=====
+=====TW:BEGIN:ts_serve=====
+{"Web":{"dockerhost-01.example.ts.net:443":{"Handlers":{"/":{"Proxy":"http://127.0.0.1:3000"},"/admin":{"Proxy":"unix:/run/tailscale/tailscaled.sock"}}}}}
+=====TW:END:ts_serve=====
+=====TW:BEGIN:ts_lock=====
+Tailnet lock is NOT enabled.
+=====TW:END:ts_lock=====
+=====TW:BEGIN:ts_procs=====
+pid=500|cgroup=/system.slice/tailscaled.service|samens=1|env_readable=1|start_epoch=1793000000|env=|cmd=/usr/sbin/tailscaled
+pid=7781|cgroup=/system.slice/docker-3f9a1c2b4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8.scope|samens=0|env_readable=1|start_epoch=1793000500|env=TS_AUTHKEY=<redacted> TS_EXTRA_ARGS=--ssh TS_STATE_DIR=/var/lib/tailscale |cmd=tailscaled --statedir=/var/lib/tailscale
+=====TW:END:ts_procs=====
+=====TW:BEGIN:ts_persist=====
+Environment=
+=====TW:END:ts_persist=====
+=====TW:BEGIN:unix_listen=====
+u_str LISTEN 0 4096 /run/tailscale/tailscaled.sock 1 * 0 users:(("tailscaled",pid=500,fd=9))
+=====TW:END:unix_listen=====
+=====TW:BEGIN:tcp_listen=====
+LISTEN 0 4096 0.0.0.0:3000 0.0.0.0:* users:(("node",pid=1200,fd=3))
+LISTEN 0 4096 0.0.0.0:3552 0.0.0.0:* users:(("arcane-agent",pid=1300,fd=3))
+=====TW:END:tcp_listen=====
+=====TW:BEGIN:sock_stat=====
+jewel=/var/run/docker.sock|present=0
+jewel=/run/docker.sock|present=0
+path=/run/tailscale/tailscaled.sock|stat=666 0 0 socket|parent=/run/tailscale|pstat=755 0 0 directory
+=====TW:END:sock_stat=====
+=====TW:BEGIN:kernel=====
+protected_symlinks=1
+=====TW:END:kernel=====
+=====TW:BEGIN:proc_comms=====
+dockerd
+containerd
+tailscaled
+=====TW:END:proc_comms=====
+=====TW:BEGIN:users=====
+=====TW:END:users=====
+=====TW:BEGIN:state=====
+=====TW:END:state=====
+=====TW:BEGIN:secrets=====
+=====TW:END:secrets=====
+=====TW:BEGIN:docker=====
+@@C|/ts-forgejo|tailscale/tailscale:latest|running|2026-09-01T10:00:00.123456789Z|false|default|/var/run/docker.sock>/var/run/docker.sock,/srv/ts>/var/lib/tailscale,
+@@A 
+@@E TS_AUTHKEY=<redacted>
+@@E TS_EXTRA_ARGS=--ssh
+@@C|/helper|alpine:3.20|exited|{RECENT}|true|host|/>/host,
+@@A sh -c sleep 5
+=====TW:END:docker=====
+=====TW:BEGIN:docker_events=====
+1793030000 create helper alpine:3.20
+1793030001 exec_create: sh helper alpine:3.20
+=====TW:END:docker_events=====
+=====TW:BEGIN:ts_logs=====
+Oct 25 03:12:01 dockerhost-01 tailscaled[500]: ssh-session(sess-1): direct-tcpip channel to 127.0.0.1:5432
+=====TW:END:ts_logs=====
+=====TW:DONE=====

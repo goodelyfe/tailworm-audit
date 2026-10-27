@@ -1,0 +1,77 @@
+=====TW:BEGIN:meta=====
+collector_version=1
+hostname=mitigated-01
+uid=0
+init=systemd
+have_ss=1
+have_docker=1
+=====TW:END:meta=====
+=====TW:BEGIN:ts_version=====
+1.104.2
+=====TW:END:ts_version=====
+=====TW:BEGIN:ts_status=====
+{"Version":"1.104.2-t1","Self":{"DNSName":"mitigated-01.example.ts.net.","HostName":"mitigated-01","OS":"linux","Tags":["tag:managed-host"]}}
+=====TW:END:ts_status=====
+=====TW:BEGIN:ts_prefs=====
+{"RunSSH":true,"RunWebClient":false,"OperatorUser":"","AutoUpdate":{"Check":true,"Apply":true},"AppConnector":{"Advertise":false}}
+=====TW:END:ts_prefs=====
+=====TW:BEGIN:ts_serve=====
+{}
+=====TW:END:ts_serve=====
+=====TW:BEGIN:ts_lock=====
+Tailnet lock is ENABLED.
+=====TW:END:ts_lock=====
+=====TW:BEGIN:ts_drive=====
+=====TW:END:ts_drive=====
+=====TW:BEGIN:ts_procs=====
+pid=812|cgroup=/system.slice/tailscaled.service|samens=1|env_readable=1|start_epoch=1793000000|env=TS_SSH_DISABLE_FORWARDING=1 |cmd=/usr/sbin/tailscaled --state=/var/lib/tailscale/tailscaled.state --socket=/run/tailscale/tailscaled.sock --port=41641
+pid=9901|cgroup=/system.slice/tailscaled.service|samens=1|env_readable=1|start_epoch=1793000100|env=|cmd=/usr/sbin/tailscaled be-child ssh --uid=0 --local-user=root
+=====TW:END:ts_procs=====
+=====TW:BEGIN:ts_persist=====
+Environment=TS_SSH_DISABLE_FORWARDING=1
+file=/etc/systemd/system/tailscaled.service.d/50-tailworm-mitigation.conf
+Environment=TS_SSH_DISABLE_FORWARDING=1
+=====TW:END:ts_persist=====
+=====TW:BEGIN:unix_listen=====
+Netid State  Recv-Q Send-Q Local Address:Port Peer Address:PortProcess
+u_str LISTEN 0 4096 /run/docker.sock 23456 * 0 users:(("dockerd",pid=700,fd=4))
+u_str LISTEN 0 4096 /run/tailscale/tailscaled.sock 23457 * 0 users:(("tailscaled",pid=812,fd=9))
+u_str LISTEN 0 4096 /run/systemd/private 1111 * 0 users:(("systemd",pid=1,fd=12))
+=====TW:END:unix_listen=====
+=====TW:BEGIN:tcp_listen=====
+State  Recv-Q Send-Q Local Address:Port Peer Address:PortProcess
+LISTEN 0 4096 127.0.0.1:8080 0.0.0.0:* users:(("app",pid=900,fd=3))
+=====TW:END:tcp_listen=====
+=====TW:BEGIN:sock_stat=====
+jewel=/var/run/docker.sock|present=1
+jewel=/run/docker.sock|present=1
+path=/run/docker.sock|stat=660 0 996 socket|parent=/run|pstat=755 0 0 directory
+path=/run/systemd/private|stat=777 0 0 socket|parent=/run/systemd|pstat=755 0 0 directory
+path=/run/tailscale/tailscaled.sock|stat=666 0 0 socket|parent=/run/tailscale|pstat=755 0 0 directory
+=====TW:END:sock_stat=====
+=====TW:BEGIN:kernel=====
+protected_symlinks=1
+protected_hardlinks=1
+protected_regular=2
+=====TW:END:kernel=====
+=====TW:BEGIN:proc_comms=====
+dockerd
+containerd
+systemd
+tailscaled
+=====TW:END:proc_comms=====
+=====TW:BEGIN:users=====
+user=deploy|shell=/bin/bash|id=uid=1001(deploy) gid=1001(deploy) groups=1001(deploy)|nopasswd=0|sudo_all=0
+=====TW:END:users=====
+=====TW:BEGIN:state=====
+pid=812|path=/var/lib/tailscale/tailscaled.state|stat=600 0 0|plaintext_json=1
+=====TW:END:state=====
+=====TW:BEGIN:secrets=====
+=====TW:END:secrets=====
+=====TW:BEGIN:docker=====
+=====TW:END:docker=====
+=====TW:BEGIN:docker_events=====
+=====TW:END:docker_events=====
+=====TW:BEGIN:ts_logs=====
+=====TW:END:ts_logs=====
+=====TW:DONE=====

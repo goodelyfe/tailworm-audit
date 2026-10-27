@@ -1,0 +1,34 @@
+=====TW:BEGIN:meta=====
+collector_version=1
+hostname=pve-01
+uid=0
+init=systemd
+have_ss=1
+have_pct=1
+=====TW:END:meta=====
+=====TW:BEGIN:ts_status=====
+{"Version":"1.100.1","Self":{"DNSName":"pve-01.example.ts.net.","HostName":"pve-01","OS":"linux","Tags":[]}}
+=====TW:END:ts_status=====
+=====TW:BEGIN:ts_prefs=====
+{"RunSSH":true,"AutoUpdate":{"Apply":false}}
+=====TW:END:ts_prefs=====
+=====TW:BEGIN:ts_procs=====
+pid=900|cgroup=/system.slice/tailscaled.service|samens=1|env_readable=1|start_epoch=1|env=|cmd=/usr/sbin/tailscaled
+pid=41000|cgroup=/lxc/105/ns/system.slice/tailscaled.service|samens=0|env_readable=1|start_epoch=1|env=|cmd=/usr/sbin/tailscaled
+=====TW:END:ts_procs=====
+=====TW:BEGIN:unix_listen=====
+=====TW:END:unix_listen=====
+=====TW:BEGIN:tcp_listen=====
+LISTEN 0 4096 *:8006 *:* users:(("pveproxy",pid=1500,fd=6))
+=====TW:END:tcp_listen=====
+=====TW:BEGIN:sock_stat=====
+=====TW:END:sock_stat=====
+=====TW:BEGIN:proc_comms=====
+pveproxy
+systemd
+tailscaled
+=====TW:END:proc_comms=====
+=====TW:BEGIN:users=====
+user=pi|shell=/bin/bash|id=uid=1000(pi) gid=1000(pi) groups=1000(pi),27(sudo)|nopasswd=1|sudo_all=1
+=====TW:END:users=====
+=====TW:DONE=====

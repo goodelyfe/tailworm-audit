@@ -1,0 +1,30 @@
+// synthetic policy exercising every PA check
+{
+  "groups": {"group:admins": ["admin@example.com"]},
+  "tagOwners": {
+    "tag:k8s-operator": ["group:admins"],
+    "tag:k8s": ["tag:k8s-operator"],   // tag owns tag
+    "tag:managed-host": ["group:admins"],
+  },
+  "autoApprovers": {"exitNode": ["tag:k8s"], "routes": {"10.42.0.0/16": ["tag:k8s"]}},
+  "ssh": [
+    {"action": "accept", "src": ["group:admins"], "dst": ["autogroup:tagged"], "users": ["root"]},
+    {"action": "accept", "src": ["tag:agent-scout"], "dst": ["tag:managed-host"], "users": ["scout"], "recorder": ["tag:recorder"], "enforceRecorder": false},
+    {"action": "accept", "src": ["autogroup:member"], "dst": ["autogroup:self"], "users": ["root", "autogroup:nonroot"]},
+    {"action": "accept", "src": ["tag:ci-runner"], "dst": ["tag:managed-host"], "users": ["deploy"], "acceptEnv": ["LD_PRELOAD", "GIT_*"]},
+  ],
+  "nodeAttrs": [
+    {"target": ["group:admins"], "attr": ["funnel"]},
+    {"target": ["autogroup:member", "autogroup:tagged"], "attr": ["drive:share", "drive:access"]},
+    {"target": ["tag:connector"], "app": {"tailscale.com/app-connectors": [{"name": "x", "connectors": ["tag:connector"], "domains": ["example.com"]}]}},
+  ],
+  "grants": [
+    {"src": ["group:admins"], "dst": ["*"], "ip": ["*"]},
+    {"src": ["tag:managed-host", "tag:k8s"], "dst": ["autogroup:tagged"], "ip": ["*"]},
+    {"src": ["autogroup:member"], "dst": ["autogroup:member", "autogroup:tagged"], "app": {"tailscale.com/cap/drive": [{"shares": ["*"], "access": "rw"}]}},
+    {"src": ["group:admins"], "dst": ["autogroup:tagged"], "ip": ["tcp:5252"], "app": {"tailscale.com/cap/webui": [{"canEdit": ["ssh", "subnets"]}]}},
+  ],
+  "sshTests": [
+    {"src": "tag:agent-scout", "dst": ["tag:managed-host"], "accept": ["scout"], "deny": ["root"]},
+  ],
+}

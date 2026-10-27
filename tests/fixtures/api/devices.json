@@ -1,0 +1,7 @@
+{"devices":[
+ {"name":"old-router.example.ts.net","clientVersion":"1.90.1-t1","os":"linux","tags":["tag:router"],"created":"2025-01-01T00:00:00Z","authorized":true,"updateAvailable":true},
+ {"name":"new-thing.example.ts.net","clientVersion":"1.104.2","os":"linux","tags":["tag:managed-host"],"created":"{RECENT}","authorized":true,"user":"admin@example.com"},
+ {"name":"dockerbox.example.ts.net","clientVersion":"1.104.2","os":"linux","tags":[],"created":"2025-03-01T00:00:00Z","authorized":true,"user":"admin@example.com"},
+ {"name":"pending.example.ts.net","clientVersion":"1.104.2","os":"windows","tags":[],"created":"2025-03-01T00:00:00Z","authorized":false},
+ {"name":"shared-in.example.ts.net","clientVersion":"1.104.2","os":"linux","tags":[],"created":"2025-03-01T00:00:00Z","authorized":true,"isExternal":true}
+]}

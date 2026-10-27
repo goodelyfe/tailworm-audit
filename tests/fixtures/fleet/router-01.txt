@@ -1,0 +1,63 @@
+=====TW:BEGIN:meta=====
+collector_version=1
+hostname=router-01
+uid=0
+DISTRIB_ID='OpenWrt'
+init=procd
+have_netstat=1
+=====TW:END:meta=====
+=====TW:BEGIN:ts_version=====
+1.92.5
+=====TW:END:ts_version=====
+=====TW:BEGIN:ts_status=====
+{"Version":"1.92.5","Self":{"DNSName":"router-01.example.ts.net.","HostName":"router-01","OS":"linux","Tags":["tag:router"]}}
+=====TW:END:ts_status=====
+=====TW:BEGIN:ts_prefs=====
+{"RunSSH":true,"AdvertiseRoutes":["192.168.8.0/24","0.0.0.0/0","::/0"],"AutoUpdate":{"Check":false,"Apply":false}}
+=====TW:END:ts_prefs=====
+=====TW:BEGIN:ts_serve=====
+=====TW:END:ts_serve=====
+=====TW:BEGIN:ts_lock=====
+Tailnet lock is NOT enabled.
+=====TW:END:ts_lock=====
+=====TW:BEGIN:ts_procs=====
+pid=2201|cgroup=/|samens=1|env_readable=1|start_epoch=1790000000|env=|cmd=/usr/sbin/tailscaled --port 41641 --state /etc/tailscale/tailscaled.state
+=====TW:END:ts_procs=====
+=====TW:BEGIN:ts_persist=====
+file=/etc/init.d/tailscale
+14:	procd_set_param command /usr/sbin/tailscaled
+=====TW:END:ts_persist=====
+=====TW:BEGIN:unix_listen=====
+Active UNIX domain sockets (only servers)
+Proto RefCnt Flags       Type       State         I-Node PID/Program name    Path
+unix  2      [ ACC ]     STREAM     LISTENING      4410 2201/tailscaled      /var/run/tailscale/tailscaled.sock
+unix  2      [ ACC ]     STREAM     LISTENING      1201 1/procd              /var/run/ubus/ubus.sock
+=====TW:END:unix_listen=====
+=====TW:BEGIN:tcp_listen=====
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      1900/nginx
+tcp        0      0 100.64.0.3:5252        0.0.0.0:*               LISTEN      2201/tailscaled
+=====TW:END:tcp_listen=====
+=====TW:BEGIN:sock_stat=====
+path=/var/run/tailscale/tailscaled.sock|stat=666 0 0 socket|parent=/var/run/tailscale|pstat=755 0 0 directory
+=====TW:END:sock_stat=====
+=====TW:BEGIN:kernel=====
+protected_symlinks=
+=====TW:END:kernel=====
+=====TW:BEGIN:proc_comms=====
+procd
+tailscaled
+nginx
+=====TW:END:proc_comms=====
+=====TW:BEGIN:users=====
+=====TW:END:users=====
+=====TW:BEGIN:state=====
+pid=2201|path=/etc/tailscale/tailscaled.state|stat=644 0 0|plaintext_json=1
+=====TW:END:state=====
+=====TW:BEGIN:secrets=====
+file=/etc/tailscale/up.sh|types=tskey-auth-****
+=====TW:END:secrets=====
+=====TW:BEGIN:ts_logs=====
+=====TW:END:ts_logs=====
+=====TW:DONE=====
